@@ -1,0 +1,11 @@
+{
+  "module": {
+    "name": "file_viewer",
+    "type": "har",
+    "deviceTypes": [
+      "default",
+      "tablet",
+      "2in1"
+    ]
+  }
+}
