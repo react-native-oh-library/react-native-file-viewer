@@ -1,6 +1,6 @@
 {
-  "name": "react-native-file-viewer",
-  "version": "2.1.5",
+  "name": "@react-native-oh-tpl/react-native-file-viewer",
+  "version": "2.1.5-0.0.1",
   "description": "Native file viewer for react-native",
   "main": "index.js",
   "types": "index.d.ts",
@@ -18,8 +18,17 @@
     "preview",
     "quicklook",
     "pdf",
-    "doc"
+    "doc",
+    "harmony"
   ],
+  "harmony": {
+    "alias": "react-native-file-viewer",
+    "codegenConfig": {
+      "specPaths": [
+        "./src"
+      ]
+    }
+  },
   "author": "Vincenzo Scamporlino",
   "repository": {
     "type": "git",
