@@ -8,6 +8,7 @@ import wantConstant from '@ohos.app.ability.wantConstant';
 import fs from '@ohos.file.fs';
 import mime from 'mime';
 import EventEmitter from './EventMitter';
+import Hilog from './Logger';
 import type { ISubscribe } from './EventMitter';
 
 type EmitID = ISubscribe['id'];
@@ -38,6 +39,7 @@ export class RNFileViewerTurboModule extends TurboModule implements TM.FileViewe
         (id: EmitID, error: string) => {
           if (id === openSubscription.id) {
             openSubscription.$off();
+            this.ctx.rnInstance.emitDeviceEvent(OPEN_EVENT, { id: currentId });
             return error ? reject(new Error(error)) : resolve();
           }
         },
@@ -47,8 +49,8 @@ export class RNFileViewerTurboModule extends TurboModule implements TM.FileViewe
         DISMISS_EVENT,
         (id: EmitID) => {
           if (id === dismissSubscription.id) {
-            this.ctx.rnInstance.emitDeviceEvent(DISMISS_EVENT, { id: currentId });
             dismissSubscription.$off();
+            this.ctx.rnInstance.emitDeviceEvent(DISMISS_EVENT, { id: currentId });
           }
         },
       );
@@ -57,13 +59,12 @@ export class RNFileViewerTurboModule extends TurboModule implements TM.FileViewe
       fs.stat(filepath)
         .then((stat: fs.Stat) => {
           this.OpenFile(filepath, this.ctx, _options);
-          console.info('get file info succeed, the size of file is ' + stat.size);
           resolve();
         })
         .catch((err: BusinessError) => {
-          console.error('get file info failed with error message: ' + err.message + ', error code: ' + err.code);
-          reject('get file info failed with error message: ' + err.message + ', error code: ' + err.code);
-          throw err;
+          Hilog.error('get file info failed with error message: ' + err.message + ', error code: ' + err.code);
+          reject('get file info failed with error code: ' + err.code);
+          throw new Error('err.code：' + err.code);
         });
     });
   }
@@ -113,8 +114,8 @@ export class RNFileViewerTurboModule extends TurboModule implements TM.FileViewe
         (err: BusinessError, result: common.AbilityResult) => {
           if (err.code) {
             // 处理业务逻辑错误
-            console.error(`startAbilityForResult failed, code is ${err.code}, message is ${err.message}`);
-            throw new Error(err.message);
+            Hilog.error(`startAbilityForResult failed, code is ${err.code}`);
+            throw new Error('err.code：' + err.code);
           }
           eventEmitter.$emit(OPEN_EVENT);
           // 关闭ability
@@ -124,7 +125,7 @@ export class RNFileViewerTurboModule extends TurboModule implements TM.FileViewe
         },
       );
     } catch (error) {
-      console.error(`Failed to startAbility. message: ${error}`);
+      Hilog.error(`Failed to startAbility. message: ${error}`);
       eventEmitter.$emit(OPEN_EVENT, error);
     }
   }
@@ -170,9 +171,9 @@ export class RNFileViewerTurboModule extends TurboModule implements TM.FileViewe
         eventEmitter.$emit(OPEN_EVENT);
       })
       .catch((err: BusinessError) => {
-        console.error(`Failed to openPreview, err.code = ${err.code}, err.message = ${err.message}`);
+        Hilog.error(`Failed to openPreview, err.code = ${err.code}`);
         eventEmitter.$emit(OPEN_EVENT, err);
-        throw new Error(err.message);
+        throw new Error('err.code：' + err.code);
       });
   }
 
