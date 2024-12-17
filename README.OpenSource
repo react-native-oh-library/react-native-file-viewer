@@ -1,0 +1,11 @@
+[
+    {
+        "Name": "react-native-file-viewer",
+        "License": "MIT License",
+        "License File": "https://github.com/vinzscam/react-native-file-viewer/blob/master/LICENSE",
+        "Version Number": "2.1.5",
+        "Owner" : "xiafeng@huawei.com",
+        "Upstream URL": "https://github.com/vinzscam/react-native-file-viewer",
+        "Description": "Native file viewer for react-native"
+    }
+]
