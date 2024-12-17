@@ -1,3 +1,4 @@
+
 interface RNFileViewerOptions {
   displayName?: string;
   showAppsSuggestions?: boolean;

@@ -1,3 +1,4 @@
+
 /**
  * Use these variables when you tailor your ArkTS code. They must be of the const type.
  */
