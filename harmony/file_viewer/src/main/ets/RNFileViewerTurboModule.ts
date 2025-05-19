@@ -15,6 +15,7 @@ import mime from 'mime';
 import EventEmitter from './EventMitter';
 import Hilog from './Logger';
 import type { ISubscribe } from './EventMitter';
+import { fileShare } from '@kit.CoreFileKit';
 
 type EmitID = ISubscribe['id'];
 
@@ -155,31 +156,55 @@ export class RNFileViewerTurboModule extends TurboModule implements TM.FileViewe
         ? (screenInfo.height - screenHeight) / 2
         : 0;
 
-    // 调用OS filePreview 进行预览
-    const displayInfo: filePreview.DisplayInfo = {
-      x: offsetX,
-      y: offsetY,
-      width: screenWidth,
-      height: screenHeight,
+    if (!canIUse('SystemCapability.FileManagement.AppFileService.FolderAuthorization')) {
+      console.error('this api is not supported on this device');
+      return;
+    }
+    let policyInfo: fileShare.PolicyInfo = {
+      uri: fileUri.getUriFromPath(uri),
+      operationMode: fileShare.OperationMode.READ_MODE,
     };
+    let policies: Array<fileShare.PolicyInfo> = [policyInfo];
 
-    const fileInfo: filePreview.PreviewInfo = {
-      title: filename,
-      uri: 'file://' + uri,
-      mimeType: fileMimeType,
-    };
+    fileShare.persistPermission(policies).then(() => {
+      console.info("persistPermission successfully");
+      // 调用OS filePreview 进行预览
+      const displayInfo: filePreview.DisplayInfo = {
+        x: offsetX,
+        y: offsetY,
+        width: screenWidth,
+        height: screenHeight,
+      };
 
-    // 打开预览窗口
-    filePreview
-      .openPreview(uiContext, fileInfo, displayInfo)
-      .then(() => {
-        eventEmitter.$emit(OPEN_EVENT);
-      })
-      .catch((err: BusinessError) => {
-        Hilog.error(`Failed to openPreview, err.code = ${err.code}`);
-        eventEmitter.$emit(OPEN_EVENT, err);
-        throw new Error('err.code：' + err.code);
-      });
+      const fileInfo: filePreview.PreviewInfo = {
+        title: filename,
+        uri: fileUri.getUriFromPath(uri),
+        mimeType: fileMimeType,
+      };
+
+      // 打开预览窗口
+      filePreview
+        .openPreview(uiContext, fileInfo, displayInfo)
+        .then(() => {
+          eventEmitter.$emit(OPEN_EVENT);
+        })
+        .catch((err: BusinessError) => {
+          Hilog.error(`Failed to openPreview, err.code = ${err.code}`);
+          eventEmitter.$emit(OPEN_EVENT, err);
+          throw new Error('err.code：' + err.code);
+        });
+    }).catch((err: BusinessError<Array<fileShare.PolicyErrorResult>>) => {
+      console.error("persistPermission failed with error message: " + err.message + ", error code: " + err.code);
+      if (err.code == 13900001 && err.data) {
+        for (let i = 0; i < err.data.length; i++) {
+          console.error("error code : " + JSON.stringify(err.data[i].code));
+          console.error("error uri : " + JSON.stringify(err.data[i].uri));
+          console.error("error reason : " + JSON.stringify(err.data[i].message));
+        }
+      }
+    });
+
+
   }
 
   public addListener(eventType: string): void {
