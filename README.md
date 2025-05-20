@@ -1,6 +1,6 @@
 # @react-native-oh-tpl/react-native-file-viewer
 
-This project is based on [react-native-file-viewer](https://github.com/vinzscam/react-native-file-viewer)
+This project is based on [react-native-file-viewer@2.1.5](https://github.com/vinzscam/react-native-file-viewer/tree/v2.1.5)
 
 ## Documentation
 
