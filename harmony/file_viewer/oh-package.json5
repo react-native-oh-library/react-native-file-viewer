@@ -1,6 +1,6 @@
 {
   "name": "@react-native-oh-tpl/react-native-file-viewer",
-  "version": "2.1.5-0.0.1",
+  "version": "2.1.6-rc.1",
   "description": "Native file viewer for react-native",
   "main": "index.ets",
   "author": "",
